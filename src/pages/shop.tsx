@@ -1,5 +1,4 @@
 // src/pages/shop.tsx
-import { useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -7,7 +6,6 @@ import { ShopItem } from '@/types';
 import { toast } from 'react-hot-toast';
 
 export default function Shop() {
-  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
 
   const handleInquiry = async (item: ShopItem) => {
     try {

@@ -1,5 +1,4 @@
-// src/pages/admin/shop/edit/[id].tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import ShopItemForm from '@/components/admin/ShopItemForm';
 import { ShopItem } from '@/types';
@@ -10,42 +9,51 @@ export default function EditShopItem() {
   const router = useRouter();
   const { id } = router.query;
 
+  const fetchItem = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!res.ok) throw new Error('Failed to fetch item');
+      const data = await res.json();
+      setItem(data);
+    } catch (_error) {
+      toast.error('Failed to fetch item');
+      router.push('/admin/dashboard');
+    }
+  }, [id, router]);
+
   useEffect(() => {
     if (id) {
       fetchItem();
     }
-  }, [id]);
+  }, [id, fetchItem]);
 
-  const fetchItem = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch item');
-      const data = await res.json();
-      setItem(data);
-    } catch (error) {
-      toast.error('Failed to fetch item');
-      router.push('/admin/dashboard');
-    }
-  };
-
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-      if (!res.ok) throw new Error('Failed to update item');
-      toast.success('Item updated successfully');
-      router.push('/admin/dashboard');
-    } catch (error) {
-      toast.error('Failed to update item');
-    }
-  };
+  const handleSubmit = useCallback(
+    async (formData: FormData) => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`,
+          {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          }
+        );
+        if (!res.ok) throw new Error('Failed to update item');
+        toast.success('Item updated successfully');
+        router.push('/admin/dashboard');
+      } catch (_error) {
+        toast.error('Failed to update item');
+      }
+    },
+    [id, router]
+  );
 
   if (!item) return <div>Loading...</div>;
 

@@ -1,5 +1,4 @@
-// src/pages/admin/projects/edit/[id].tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import ProjectForm from '@/components/admin/ProjectForm';
 import { Project } from '@/types';
@@ -10,42 +9,51 @@ export default function EditProject() {
   const router = useRouter();
   const { id } = router.query;
 
-  useEffect(() => {
-    if (id) fetchProject();
-  }, [id]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!res.ok) throw new Error('Failed to fetch project');
       const data = await res.json();
       setProject(data);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to fetch project');
       router.push('/admin/dashboard');
     }
-  };
+  }, [id, router]);
 
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Failed to update project');
-      
-      toast.success('Project updated successfully');
-      router.push('/admin/dashboard');
-    } catch (error) {
-      toast.error('Failed to update project');
+  useEffect(() => {
+    if (id) {
+      fetchProject();
     }
-  };
+  }, [id, fetchProject]);
+
+  const handleSubmit = useCallback(
+    async (formData: FormData) => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`,
+          {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          }
+        );
+        if (!res.ok) throw new Error('Failed to update project');
+        toast.success('Project updated successfully');
+        router.push('/admin/dashboard');
+      } catch (_error) {
+        toast.error('Failed to update project');
+      }
+    },
+    [id, router]
+  );
 
   if (!project) return <div>Loading...</div>;
 

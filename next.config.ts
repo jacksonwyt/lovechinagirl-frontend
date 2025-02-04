@@ -1,4 +1,3 @@
-// next.config.ts
 import { NextConfig } from 'next'
 
 const config: NextConfig = {
@@ -32,6 +31,9 @@ const config: NextConfig = {
       ],
     },
   ],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 export default config

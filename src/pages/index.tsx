@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
-import { motion } from 'framer-motion';
 import PortfolioItem from '@/components/portfolio/PortfolioItem';
 import { Project } from '@/types';
 import { Loader2 } from 'lucide-react';

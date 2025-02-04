@@ -15,11 +15,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = () => {
+const checkAuth = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsAuthenticated(false);
@@ -44,6 +40,12 @@ export function useAuth() {
       logout();
     }
   };
+  
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  
 
   const login = async (username: string, password: string) => {
     try {

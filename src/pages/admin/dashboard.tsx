@@ -19,7 +19,7 @@ export default function Dashboard() {
 
     fetchProjects();
     fetchShopItems();
-  }, []);
+  }, [router]);
 
   const fetchProjects = async () => {
     try {
@@ -30,7 +30,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error('Failed to fetch projects');
       const data = await res.json();
       setProjects(data);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to fetch projects');
     }
   };
@@ -44,7 +44,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error('Failed to fetch shop items');
       const data = await res.json();
       setShopItems(data);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to fetch shop items');
     }
   };
@@ -59,7 +59,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error('Failed to delete project');
       toast.success('Project deleted successfully');
       fetchProjects();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete project');
     }
   };
@@ -74,7 +74,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error('Failed to delete item');
       toast.success('Item deleted successfully');
       fetchShopItems();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete item');
     }
   };
