@@ -1,16 +1,13 @@
-
+// Footer.tsx
 const Footer = () => {
   return (
     <footer className="bg-[#FFF5F6] border-t border-[#FFC0CB]">
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div>
+      <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center text-center">
+        <div className="mb-8">
           <h3 className="text-[#8B0023] font-semibold mb-4">About</h3>
           <p className="text-gray-600">Creating beautiful spaces.</p>
         </div>
-      
-        
 
-        
         <div>
           <h3 className="text-[#8B0023] font-semibold mb-4">Contact</h3>
           <ul className="space-y-2">
