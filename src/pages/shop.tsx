@@ -93,8 +93,11 @@ export default function Shop({ items }: ShopProps) {
 
 // This function runs at build time or on every request (if using SSR)
 export async function getServerSideProps() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop-items`);
-  const items: ShopItem[] = await res.json();
-
-  return { props: { items } };
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop`); // Remove extra 'api'
+    const items = await res.json();
+    return { props: { items } };
+  } catch (error) {
+    return { props: { items: [] } };
+  }
 }

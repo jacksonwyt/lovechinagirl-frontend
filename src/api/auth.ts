@@ -1,4 +1,5 @@
 // src/api/auth.ts
+// src/api/auth.ts
 import api from './axios';
 
 interface LoginCredentials {
@@ -12,5 +13,6 @@ interface LoginResponse {
 
 export const authApi = {
   login: (credentials: LoginCredentials) => 
-    api.post<LoginResponse>('/auth/login', credentials),
+    api.post<LoginResponse>('/admin/login', credentials),
+  verify: () => api.get('/admin/verify')
 };

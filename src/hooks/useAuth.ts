@@ -1,21 +1,14 @@
 // src/hooks/useAuth.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { authApi } from '@/api/auth';
-import { jwtDecode } from "jwt-decode";
-
-interface TokenPayload {
-  exp: number;
-  username: string;
-  sub: string;
-}
 
 export function useAuth() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-const checkAuth = () => {
+  const checkAuth = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsAuthenticated(false);
@@ -23,29 +16,16 @@ const checkAuth = () => {
     }
 
     try {
-      const decoded = jwtDecode<TokenPayload>(token);
-      const currentTime = Date.now() / 1000;
-
-      if (decoded.exp < currentTime) {
-        logout();
-        return;
-      }
-
+      await authApi.verify();
       setIsAuthenticated(true);
-
-      // Set up auto-logout
-      const timeUntilExpiry = (decoded.exp - currentTime) * 1000;
-      setTimeout(logout, timeUntilExpiry);
     } catch {
       logout();
     }
-  };
-  
-  useEffect(() => {
-    checkAuth();
   }, []);
 
-  
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (username: string, password: string) => {
     try {
@@ -59,11 +39,11 @@ const checkAuth = () => {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     router.push('/admin/login');
-  };
+  }, [router]);
 
-  return { login, logout, loading, isAuthenticated };
+  return { login, logout, loading, isAuthenticated, checkAuth };
 }
