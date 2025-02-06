@@ -5,8 +5,11 @@ import { motion } from 'framer-motion';
 import { ShopItem } from '@/types';
 import { toast } from 'react-hot-toast';
 
-export default function Shop() {
+interface ShopProps {
+  items: ShopItem[];
+}
 
+export default function Shop({ items }: ShopProps) {
   const handleInquiry = async (item: ShopItem) => {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contact`, {
@@ -88,15 +91,10 @@ export default function Shop() {
   );
 }
 
-// Example data - replace with actual data from your API
-const items: ShopItem[] = [
-  {
-    id: '1',
-    name: 'Vintage Chinese Vase',
-    description: 'Beautiful handcrafted vase from the Ming Dynasty period.',
-    images: ['/images/vase-1.jpg'],
-    category: 'Ceramics',
-    status: 'available',
-  },
-  // Add more items...
-];
+// This function runs at build time or on every request (if using SSR)
+export async function getServerSideProps() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop-items`);
+  const items: ShopItem[] = await res.json();
+
+  return { props: { items } };
+}
