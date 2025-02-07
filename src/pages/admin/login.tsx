@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { authApi } from '@/api/auth';
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -13,20 +14,12 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-      
-      if (!res.ok) throw new Error('Invalid credentials');
-      
-      const { access_token } = await res.json();
-      localStorage.setItem('token', access_token);
+      const { data } = await authApi.login(credentials);
+      localStorage.setItem('token', data.access_token);
       toast.success('Login successful');
       router.push('/admin/dashboard');
     } catch (error) {
-      toast.error('Invalid username or password');
+      // The error toast is handled by the axios interceptor
     } finally {
       setIsLoading(false);
     }
