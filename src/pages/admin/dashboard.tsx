@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Project, ShopItem } from '@/types';
 import { toast } from 'react-hot-toast';
+import { projectsApi } from '@/api/projects';
+import { shopApi } from '@/api/shop';
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -23,59 +25,39 @@ export default function Dashboard() {
 
   const fetchProjects = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch projects');
-      const data = await res.json();
+      const { data } = await projectsApi.getAll();
       setProjects(data);
-    } catch (_error) {
-      toast.error('Failed to fetch projects');
+    } catch (error) {
+      // Error toast is handled by axios interceptor
     }
   };
 
   const fetchShopItems = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch shop items');
-      const data = await res.json();
+      const { data } = await shopApi.getAll();
       setShopItems(data);
-    } catch (_error) {
-      toast.error('Failed to fetch shop items');
+    } catch (error) {
+      // Error toast is handled by axios interceptor
     }
   };
 
   const deleteProject = async (id: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to delete project');
+      await projectsApi.delete(id);
       toast.success('Project deleted successfully');
       fetchProjects();
-    } catch (_error) {
-      toast.error('Failed to delete project');
+    } catch (error) {
+      // Error toast is handled by axios interceptor
     }
   };
 
   const deleteShopItem = async (id: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to delete item');
+      await shopApi.delete(id);
       toast.success('Item deleted successfully');
       fetchShopItems();
-    } catch (_error) {
-      toast.error('Failed to delete item');
+    } catch (error) {
+      // Error toast is handled by axios interceptor
     }
   };
 
