@@ -13,11 +13,15 @@ export default function ProjectForm({ project, onSubmit }: ProjectFormProps) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+  
+    // Remove any existing images from formData
+    formData.delete('images');
     
+    // Add each image to formData
     images.forEach(image => {
       formData.append('images', image);
     });
-
+  
     onSubmit(formData);
   };
 

@@ -17,27 +17,29 @@ export default function ShopItemForm({ item, onSubmit }: ShopItemFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-
+  
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    
-    const validationData = {
-      name: formData.get('name') as string,
-      description: formData.get('description') as string,
-      category: formData.get('category') as string,
-      status: formData.get('status') as 'available' | 'sold' | 'reserved',
-      images: images
-    };
-
+  
+    // Remove any existing images from formData
+    formData.delete('images');
+  
     try {
-      // Validate the data
+      const validationData = {
+        name: formData.get('name') as string,
+        description: formData.get('description') as string,
+        category: formData.get('category') as string,
+        status: formData.get('status') as 'available' | 'sold' | 'reserved',
+        images: images.length > 0 ? images : null // Validate if images exist
+      };
+  
       shopItemSchema.parse(validationData);
       
-      // If validation passes, submit the form
+      // Add each image to formData after validation
       images.forEach(image => {
         formData.append('images', image);
       });
-
+  
       onSubmit(formData);
     } catch (error) {
       if (error instanceof ZodError) {

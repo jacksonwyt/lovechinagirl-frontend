@@ -9,11 +9,17 @@ export default function CreateProject() {
 
   const handleSubmit = async (formData: FormData) => {
     try {
+      // Make sure FormData includes files
+      const filesArray = Array.from(formData.getAll('images'));
+      if (!filesArray.length) {
+        throw new Error('Please select at least one image');
+      }
+  
       await projectsApi.create(formData);
       toast.success('Project created successfully');
       router.push('/admin/dashboard');
     } catch (error) {
-      // Error is handled by axios interceptor
+      console.error('Upload error:', error);
     }
   };
 
