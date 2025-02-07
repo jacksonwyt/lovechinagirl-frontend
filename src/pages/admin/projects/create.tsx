@@ -2,25 +2,18 @@
 import { useRouter } from 'next/router';
 import ProjectForm from '@/components/admin/ProjectForm';
 import { toast } from 'react-hot-toast';
+import { projectsApi } from '@/api/projects';
 
 export default function CreateProject() {
   const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Failed to create project');
-      
+      await projectsApi.create(formData);
       toast.success('Project created successfully');
       router.push('/admin/dashboard');
     } catch (error) {
-      toast.error('Failed to create project');
+      // Error is handled by axios interceptor
     }
   };
 

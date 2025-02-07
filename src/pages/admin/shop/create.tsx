@@ -2,23 +2,18 @@
 import { useRouter } from 'next/router';
 import ShopItemForm from '@/components/admin/ShopItemForm';
 import { toast } from 'react-hot-toast';
+import { shopApi } from '@/api/shop';
 
 export default function CreateShopItem() {
   const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-      if (!res.ok) throw new Error('Failed to create item');
+      await shopApi.create(formData);
       toast.success('Item created successfully');
       router.push('/admin/dashboard');
     } catch (error) {
-      toast.error('Failed to create item');
+      // Error is handled by axios interceptor
     }
   };
 
