@@ -6,6 +6,7 @@ import PortfolioItem from '@/components/portfolio/PortfolioItem';
 import { Project } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import api from '@/api/axios';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -20,15 +21,10 @@ export default function Home() {
   const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/projects?page=${page}&limit=${ITEMS_PER_PAGE}`
-      );
-      if (!res.ok) throw new Error('Failed to fetch projects');
-      
-      const data = await res.json();
-// data is now an array, not an object with an "items" property
-setProjects(prev => [...prev, ...data]);
-setHasMore(data.length === ITEMS_PER_PAGE);
+      const res = await api.get(`/projects?page=${page}&limit=${ITEMS_PER_PAGE}`);
+      const data = res.data;
+      setProjects(prev => [...prev, ...data]);
+      setHasMore(data.length === ITEMS_PER_PAGE);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       toast.error('Failed to load projects');

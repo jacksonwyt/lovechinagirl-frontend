@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ShopItem } from '@/types';
 import { toast } from 'react-hot-toast';
+import api from '@/api/axios';
 
 interface ShopProps {
   items: ShopItem[];
@@ -12,13 +13,9 @@ interface ShopProps {
 export default function Shop({ items }: ShopProps) {
   const handleInquiry = async (item: ShopItem) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: `Inquiry about: ${item.name}`,
-          message: `I'm interested in this item: ${item.name}`,
-        }),
+      await api.post('/contact', {
+        subject: `Inquiry about: ${item.name}`,
+        message: `I'm interested in this item: ${item.name}`,
       });
       toast.success('Inquiry sent successfully!');
     } catch (error) {
@@ -94,8 +91,8 @@ export default function Shop({ items }: ShopProps) {
 // This function runs at build time or on every request (if using SSR)
 export async function getServerSideProps() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop`); // Remove extra 'api'
-    const items = await res.json();
+    const res = await api.get('/shop');
+const items = res.data;
     return { props: { items } };
   } catch (error) {
     return { props: { items: [] } };
