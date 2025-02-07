@@ -3,23 +3,20 @@ import { useRouter } from 'next/router';
 import ShopItemForm from '@/components/admin/ShopItemForm';
 import { ShopItem } from '@/types';
 import { toast } from 'react-hot-toast';
+import { shopApi } from '@/api/shop';
 
 export default function EditShopItem() {
   const [item, setItem] = useState<ShopItem | null>(null);
   const router = useRouter();
   const { id } = router.query;
 
+  /**
+   * Fetch the existing shop item using shopApi (Axios)
+   */
   const fetchItem = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) throw new Error('Failed to fetch item');
-      const data = await res.json();
+      // shopApi.getOne() returns an AxiosResponse<ShopItem>
+      const { data } = await shopApi.getOne(id as string);
       setItem(data);
     } catch (_error) {
       toast.error('Failed to fetch item');
@@ -33,19 +30,13 @@ export default function EditShopItem() {
     }
   }, [id, fetchItem]);
 
+  /**
+   * Submit updated form data using shopApi (Axios)
+   */
   const handleSubmit = useCallback(
     async (formData: FormData) => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/shop/${id}`,
-          {
-            method: 'PUT',
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-          }
-        );
-        if (!res.ok) throw new Error('Failed to update item');
+        await shopApi.update(id as string, formData);
         toast.success('Item updated successfully');
         router.push('/admin/dashboard');
       } catch (_error) {
@@ -55,7 +46,9 @@ export default function EditShopItem() {
     [id, router]
   );
 
-  if (!item) return <div>Loading...</div>;
+  if (!item) {
+    return <div className="text-white">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-black p-8">
@@ -66,3 +59,4 @@ export default function EditShopItem() {
     </div>
   );
 }
+
