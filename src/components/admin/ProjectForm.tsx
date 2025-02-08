@@ -14,16 +14,18 @@ export default function ProjectForm({ project, onSubmit }: ProjectFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
+    const formData = new FormData();
   
-    // Remove any existing images from formData
-    formData.delete('images');
-    
-    // Add each image to formData
+    formData.append('title', form.title.value);
+    formData.append('description', form.description.value);
+    formData.append('year', form.year.value);
+    formData.append('tags', form.tags.value);
+  
     images.forEach(image => {
       formData.append('images', image);
     });
   
+    console.log('Submitting files:', images.length);
     onSubmit(formData);
   };
 
