@@ -140,34 +140,32 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
 }
 
 // This gets called on every request
-export const getServerSideProps: GetServerSideProps = async (context) => {
+// src/pages/projects/[id].tsx
+export const getServerSideProps: GetServerSideProps = async ({ params, req }) => {
     try {
-      const id = context.params?.id;
-      
+      const id = params?.id;
       if (!id || Array.isArray(id)) {
-        console.error('Invalid project ID:', id);
         return { notFound: true };
       }
   
-      console.log(`Fetching project ${id} from ${process.env.NEXT_PUBLIC_API_URL}`);
-      const response = await projectsApi.getOne(id);
-  
-      if (!response.data) {
-        console.error('No project data received');
-        return { notFound: true };
+      // Use absolute URL for SSR
+      const protocol = req.headers['x-forwarded-proto'] || 'https';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || `${protocol}://${req.headers.host}`;
+      
+      const response = await fetch(`${baseUrl}/api/projects/${id}`);
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
       }
+  
+      const project = await response.json();
   
       return {
         props: {
-          project: response.data
+          project
         }
       };
-    } catch (error: any) {
-      console.error('Project fetch error:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data
-      });
+    } catch (error) {
+      console.error('Failed to fetch project:', error);
       return { notFound: true };
     }
   };

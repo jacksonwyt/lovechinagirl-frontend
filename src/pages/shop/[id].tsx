@@ -159,24 +159,32 @@ export default function ShopItemDetail({ item }: ShopItemDetailProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+// src/pages/shop/[id].tsx
+export const getServerSideProps: GetServerSideProps = async ({ params, req }) => {
     try {
       const id = params?.id;
       if (!id || Array.isArray(id)) {
         return { notFound: true };
       }
   
-      const response = await shopApi.getOne(id);
+      // Use absolute URL for SSR
+      const protocol = req.headers['x-forwarded-proto'] || 'https';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || `${protocol}://${req.headers.host}`;
       
+      const response = await fetch(`${baseUrl}/api/shop/${id}`);
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+  
+      const item = await response.json();
+  
       return {
         props: {
-          item: response.data
+          item
         }
       };
     } catch (error) {
-      console.error('Error fetching shop item:', error);
-      return {
-        notFound: true
-      };
+      console.error('Failed to fetch shop item:', error);
+      return { notFound: true };
     }
   };
