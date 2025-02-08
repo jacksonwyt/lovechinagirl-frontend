@@ -41,7 +41,7 @@ export default function ProjectForm({ project, onSubmit }: ProjectFormProps) {
         <input
           name="title"
           defaultValue={project?.title}
-          className="w-full p-2 bg-gray-900 border border-red-800 rounded"
+          className="w-full p-2 bg-gray-900 border border-red-800 rounded text-white"
           required
         />
       </div>
@@ -51,8 +51,7 @@ export default function ProjectForm({ project, onSubmit }: ProjectFormProps) {
         <textarea
           name="description"
           defaultValue={project?.description}
-          className="w-full p-2 bg-gray-900 border border-red-800 rounded h-32"
-          required
+          className="w-full p-2 bg-gray-900 border border-red-800 rounded h-32 text-white"
         />
       </div>
 

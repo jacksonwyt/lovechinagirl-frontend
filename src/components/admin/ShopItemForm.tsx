@@ -67,7 +67,7 @@ export default function ShopItemForm({ item, onSubmit }: ShopItemFormProps) {
         <input
           name="name"
           defaultValue={item?.name}
-          className={`w-full p-2 bg-gray-900 border rounded ${getErrorClass('name')}`}
+          className={`w-full p-2 bg-gray-900 border rounded text-white ${getErrorClass('fieldName')}`}
         />
         {errors.name && (
           <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -79,7 +79,7 @@ export default function ShopItemForm({ item, onSubmit }: ShopItemFormProps) {
         <textarea
           name="description"
           defaultValue={item?.description}
-          className={`w-full p-2 bg-gray-900 border rounded h-32 ${getErrorClass('description')}`}
+          className={`w-full p-2 bg-gray-900 border rounded text-white ${getErrorClass('fieldName')}`}
         />
         {errors.description && (
           <p className="text-red-500 text-sm mt-1">{errors.description}</p>
@@ -117,7 +117,7 @@ export default function ShopItemForm({ item, onSubmit }: ShopItemFormProps) {
         <select
           name="status"
           defaultValue={item?.status || 'available'}
-          className={`w-full p-2 bg-gray-900 border rounded ${getErrorClass('status')}`}
+          className={`w-full p-2 bg-gray-900 border rounded text-white ${getErrorClass('fieldName')}`}
         >
           <option value="available">Available</option>
           <option value="reserved">Reserved</option>
