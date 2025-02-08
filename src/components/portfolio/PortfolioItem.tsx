@@ -1,7 +1,8 @@
+// src/components/portfolio/PortfolioItem.tsx
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Project } from '@/types';
 
 interface PortfolioItemProps {
@@ -9,23 +10,19 @@ interface PortfolioItemProps {
 }
 
 const PortfolioItem = ({ project }: PortfolioItemProps) => {
-  const [currentImage, setCurrentImage] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
-  const nextImage = () => setCurrentImage((prev) => (prev + 1) % project.images.length);
-  const prevImage = () => setCurrentImage((prev) => (prev - 1 + project.images.length) % project.images.length);
-
-  const handleImageError = (e: any) => {
-    console.error('Image failed to load:', e);
-    // You might want to set a fallback image here
+  const handleClick = () => {
+    router.push(`/projects/${project.id}`);
   };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900"
+      className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900 cursor-pointer"
+      onClick={handleClick}
     >
       <div className={`relative w-full h-full ${isLoading ? 'animate-pulse bg-gray-800' : ''}`}>
         <Image
@@ -35,7 +32,6 @@ const PortfolioItem = ({ project }: PortfolioItemProps) => {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           onLoad={() => setIsLoading(false)}
-          onError={handleImageError}
           unoptimized
         />
       </div>
@@ -50,60 +46,11 @@ const PortfolioItem = ({ project }: PortfolioItemProps) => {
               </span>
             ))}
           </div>
-          <button
-            onClick={() => setIsExpanded(true)}
-            className="text-white hover:text-red-400 transition-colors"
-          >
+          <p className="text-white hover:text-red-400 transition-colors">
             View Project
-          </button>
+          </p>
         </div>
       </div>
-
-      {isExpanded && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-6xl w-full">
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="absolute -top-12 right-0 text-white hover:text-red-400"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="relative aspect-[16/9]">
-              <Image
-                src={project.images[currentImage]}
-                alt={project.title}
-                fill
-                sizes="100vw"
-                className="rounded-lg object-contain"
-                quality={90}
-              />
-              
-              {project.images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:text-red-400"
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:text-red-400"
-                  >
-                    <ChevronRight size={24} />
-                  </button>
-                </>
-              )}
-            </div>
-
-            <div className="mt-4 text-white">
-              <h3 className="text-2xl font-bold text-red-500 mb-2">{project.title}</h3>
-              <p className="text-gray-300">{project.description}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 };

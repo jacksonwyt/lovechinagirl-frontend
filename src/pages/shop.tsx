@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { ShopItem } from '@/types';
-import { toast } from 'react-hot-toast';
 import { shopApi } from '@/api/shop';
 
 export default function Shop() {
+  const router = useRouter();
   const [items, setItems] = useState<ShopItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,26 +19,10 @@ export default function Shop() {
       try {
         setLoading(true);
         const response = await shopApi.getAll();
-        console.log('API Response:', {
-          status: response.status,
-          data: response.data,
-          headers: response.headers
-        });
-        
-        if (!Array.isArray(response.data)) {
-          console.error('Invalid response format:', response.data);
-          throw new Error('Invalid data format received');
-        }
-        
         setItems(response.data);
       } catch (err: any) {
-        console.error('Shop fetch error:', {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status
-        });
+        console.error('Shop fetch error:', err);
         setError(err.response?.data?.message || 'Failed to load shop items');
-        toast.error('Failed to load shop items. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -45,6 +30,10 @@ export default function Shop() {
 
     fetchItems();
   }, []);
+
+  const handleItemClick = (itemId: string) => {
+    router.push(`/shop/${itemId}`);
+  };
 
   if (loading) {
     return (
@@ -85,7 +74,8 @@ export default function Shop() {
                 key={item.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900"
+                className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900 cursor-pointer"
+                onClick={() => handleItemClick(item.id)}
               >
                 <div className="relative w-full h-full">
                   {item.images?.[0] && (
@@ -95,13 +85,6 @@ export default function Shop() {
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        console.error('Image load error:', {
-                          src: item.images[0],
-                          itemId: item.id
-                        });
-                        e.currentTarget.style.display = 'none';
-                      }}
                       unoptimized
                     />
                   )}
@@ -110,29 +93,22 @@ export default function Shop() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 p-4 w-full">
                     <h3 className="text-xl font-bold text-white mb-2">
-                      {item.name || 'Untitled Item'}
+                      {item.name}
                     </h3>
-                    {item.description && (
-                      <p className="text-gray-200 mb-3 line-clamp-2">{item.description}</p>
-                    )}
+                    <p className="text-gray-200 mb-3 line-clamp-2">
+                      {item.description}
+                    </p>
                     <div className="flex justify-between items-center">
                       <span className={`px-2 py-1 rounded text-sm ${
                         item.status === 'available' ? 'bg-green-900 text-green-300' :
                         item.status === 'reserved' ? 'bg-yellow-900 text-yellow-300' :
                         'bg-red-900 text-red-300'
                       }`}>
-                        {item.status || 'unknown'}
+                        {item.status}
                       </span>
-                      {item.status === 'available' && (
-                        <button
-                          onClick={() => {
-                            toast.success('Inquiry feature coming soon!');
-                          }}
-                          className="text-white hover:text-red-400 transition-colors"
-                        >
-                          Inquire
-                        </button>
-                      )}
+                      <span className="text-white hover:text-red-400 transition-colors">
+                        View Details →
+                      </span>
                     </div>
                   </div>
                 </div>
