@@ -16,10 +16,15 @@ export default function ProjectForm({ project, onSubmit }: ProjectFormProps) {
     const form = e.target as HTMLFormElement;
     const formData = new FormData();
   
-    formData.append('title', form.title.value);
-    formData.append('description', form.description.value);
-    formData.append('year', form.year.value);
-    formData.append('tags', form.tags.value);
+    const titleInput = form.querySelector('input[name="title"]') as HTMLInputElement;
+    const descriptionInput = form.querySelector('textarea[name="description"]') as HTMLTextAreaElement;
+    const yearInput = form.querySelector('input[name="year"]') as HTMLInputElement;
+    const tagsInput = form.querySelector('input[name="tags"]') as HTMLInputElement;
+  
+    formData.append('title', titleInput.value);
+    formData.append('description', descriptionInput.value);
+    formData.append('year', yearInput.value);
+    formData.append('tags', tagsInput.value);
   
     images.forEach(image => {
       formData.append('images', image);
