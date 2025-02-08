@@ -2,10 +2,10 @@ import { NextConfig } from 'next'
 
 const config: NextConfig = {
   images: {
-    domains: ['lovechinagirldesign-assets.s3.us-west-1.amazonaws.com'],
+    domains: [process.env.NEXT_PUBLIC_IMAGE_DOMAIN || 'lovechinagirldesign-assets.s3.us-west-1.amazonaws.com'],
     remotePatterns: [{
       protocol: 'https',
-      hostname: 'lovechinagirldesign-assets.s3.us-west-1.amazonaws.com',
+      hostname: process.env.NEXT_PUBLIC_IMAGE_DOMAIN || 'lovechinagirldesign-assets.s3.us-west-1.amazonaws.com',
       pathname: '/uploads/**'
     }],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
