@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Project } from '@/types';
 import api from '@/api/axios';
+import { projectsApi } from '@/api/projects';
 
 interface ProjectDetailProps {
   project: Project;
@@ -141,24 +142,23 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
 
 // This gets called on every request
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  try {
-    // Fetch project data
-    const response = await api.get(`/api/projects/${params?.id}`);
-    
-    // Pass data to the page via props
-    return {
-      props: {
-        project: response.data
+    try {
+      const id = params?.id;
+      if (!id || Array.isArray(id)) {
+        return { notFound: true };
       }
-    };
-  } catch (error) {
-    console.error('Error fetching project:', error);
-    // If there was an error, redirect to the projects page
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-};
+  
+      const response = await projectsApi.getOne(id);
+      
+      return {
+        props: {
+          project: response.data
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching project:', error);
+      return {
+        notFound: true
+      };
+    }
+  };

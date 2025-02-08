@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { ShopItem } from '@/types';
 import api from '@/api/axios';
+import { shopApi } from '@/api/shop';
 
 interface ShopItemDetailProps {
   item: ShopItem;
@@ -160,10 +161,13 @@ export default function ShopItemDetail({ item }: ShopItemDetailProps) {
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     try {
-      // Fetch shop item data
-      const response = await api.get(`/api/shop/${params?.id}`);
+      const id = params?.id;
+      if (!id || Array.isArray(id)) {
+        return { notFound: true };
+      }
+  
+      const response = await shopApi.getOne(id);
       
-      // Pass data to the page via props
       return {
         props: {
           item: response.data
@@ -171,12 +175,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       };
     } catch (error) {
       console.error('Error fetching shop item:', error);
-      // If there was an error, redirect to the shop page
       return {
-        redirect: {
-          destination: '/shop',
-          permanent: false,
-        },
+        notFound: true
       };
     }
   };
