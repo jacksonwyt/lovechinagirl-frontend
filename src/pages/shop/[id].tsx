@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { ShopItem } from '@/types';
-import { shopApi } from '@/api/shop';
 import api from '@/api/axios';
 
 interface ShopItemDetailProps {
@@ -15,7 +15,16 @@ interface ShopItemDetailProps {
 }
 
 export default function ShopItemDetail({ item }: ShopItemDetailProps) {
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  if (router.isFallback) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
+  }
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % item.images.length);
@@ -29,7 +38,7 @@ export default function ShopItemDetail({ item }: ShopItemDetailProps) {
 
   const handleInquiry = async () => {
     try {
-      await api.post('/contact', {
+      await api.post('/api/contact', {
         subject: `Inquiry about: ${item.name}`,
         message: `I'm interested in this item: ${item.name}`,
       });
@@ -150,18 +159,24 @@ export default function ShopItemDetail({ item }: ShopItemDetailProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  try {
-    const id = params?.id as string;
-    const response = await shopApi.getOne(id);
-    
-    return {
-      props: {
-        item: response.data
-      }
-    };
-  } catch (error) {
-    return {
-      notFound: true
-    };
-  }
-};
+    try {
+      // Fetch shop item data
+      const response = await api.get(`/api/shop/${params?.id}`);
+      
+      // Pass data to the page via props
+      return {
+        props: {
+          item: response.data
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching shop item:', error);
+      // If there was an error, redirect to the shop page
+      return {
+        redirect: {
+          destination: '/shop',
+          permanent: false,
+        },
+      };
+    }
+  };

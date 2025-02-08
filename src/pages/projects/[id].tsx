@@ -1,19 +1,31 @@
 // src/pages/projects/[id].tsx
+// src/pages/projects/[id].tsx
 import { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Project } from '@/types';
-import { projectsApi } from '@/api/projects';
+import api from '@/api/axios';
 
 interface ProjectDetailProps {
   project: Project;
 }
 
 export default function ProjectDetail({ project }: ProjectDetailProps) {
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // If the page is still generating, show loading state
+  if (router.isFallback) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
+  }
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
@@ -40,7 +52,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
             className="space-y-8"
           >
             {/* Image Gallery */}
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-900">
               <Image
                 src={project.images[currentImageIndex]}
                 alt={`${project.title} - Image ${currentImageIndex + 1}`}
@@ -127,19 +139,26 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
   );
 }
 
+// This gets called on every request
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   try {
-    const id = params?.id as string;
-    const response = await projectsApi.getOne(id);
+    // Fetch project data
+    const response = await api.get(`/api/projects/${params?.id}`);
     
+    // Pass data to the page via props
     return {
       props: {
         project: response.data
       }
     };
   } catch (error) {
+    console.error('Error fetching project:', error);
+    // If there was an error, redirect to the projects page
     return {
-      notFound: true
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
     };
   }
 };
