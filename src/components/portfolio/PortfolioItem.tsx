@@ -16,6 +16,11 @@ const PortfolioItem = ({ project }: PortfolioItemProps) => {
   const nextImage = () => setCurrentImage((prev) => (prev + 1) % project.images.length);
   const prevImage = () => setCurrentImage((prev) => (prev - 1 + project.images.length) % project.images.length);
 
+  const handleImageError = (e: any) => {
+    console.error('Image failed to load:', e);
+    // You might want to set a fallback image here
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -23,15 +28,16 @@ const PortfolioItem = ({ project }: PortfolioItemProps) => {
       className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900"
     >
       <div className={`relative w-full h-full ${isLoading ? 'animate-pulse bg-gray-800' : ''}`}>
-      <Image
-  src={project.images[0]}
-  alt={project.title}
-  fill
-  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  className="object-cover"
-  loading="lazy"
-  quality={75}
-/>
+        <Image
+          src={project.images[0]}
+          alt={project.title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          onLoad={() => setIsLoading(false)}
+          onError={handleImageError}
+          unoptimized
+        />
       </div>
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
