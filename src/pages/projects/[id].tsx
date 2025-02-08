@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Project } from '@/types';
-import api from '@/api/axios';
 import { projectsApi } from '@/api/projects';
 
 interface ProjectDetailProps {
@@ -141,24 +140,34 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
 }
 
 // This gets called on every request
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
     try {
-      const id = params?.id;
+      const id = context.params?.id;
+      
       if (!id || Array.isArray(id)) {
+        console.error('Invalid project ID:', id);
         return { notFound: true };
       }
   
+      console.log(`Fetching project ${id} from ${process.env.NEXT_PUBLIC_API_URL}`);
       const response = await projectsApi.getOne(id);
-      
+  
+      if (!response.data) {
+        console.error('No project data received');
+        return { notFound: true };
+      }
+  
       return {
         props: {
           project: response.data
         }
       };
-    } catch (error) {
-      console.error('Error fetching project:', error);
-      return {
-        notFound: true
-      };
+    } catch (error: any) {
+      console.error('Project fetch error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      return { notFound: true };
     }
   };
