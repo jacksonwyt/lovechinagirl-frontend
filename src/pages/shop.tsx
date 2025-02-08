@@ -21,8 +21,7 @@ export default function Shop({ items }: ShopProps) {
     } catch (error) {
       toast.error('Failed to send inquiry. Please try again.');
     }
-  };
-
+};
   return (
     <>
       <Head>
@@ -31,53 +30,45 @@ export default function Shop({ items }: ShopProps) {
       </Head>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold text-red-500 mb-12 text-center"
-        >
-          Shop Our Collection
-        </motion.h1>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {items.map((item) => (
+          {items?.map((item) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-white rounded-lg overflow-hidden shadow-lg"
+              className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-900"
             >
-              <div className="relative h-64">
+              <div className="relative w-full h-full">
                 <Image
                   src={item.images[0]}
                   alt={item.name}
                   fill
-                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {item.name}
-                </h3>
-                <p className="text-gray-600 mb-4">{item.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    item.status === 'available' 
-                      ? 'bg-green-100 text-green-800'
-                      : item.status === 'reserved'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                  </span>
-                  {item.status === 'available' && (
-                    <button
-                      onClick={() => handleInquiry(item)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                    >
-                      Inquire
-                    </button>
-                  )}
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 p-4 w-full">
+                  <h3 className="text-xl font-bold text-white mb-2">{item.name}</h3>
+                  <p className="text-gray-200 mb-3 line-clamp-2">{item.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className={`px-2 py-1 rounded text-sm ${
+                      item.status === 'available' ? 'bg-green-900 text-green-300' :
+                      item.status === 'reserved' ? 'bg-yellow-900 text-yellow-300' :
+                      'bg-red-900 text-red-300'
+                    }`}>
+                      {item.status}
+                    </span>
+                    {item.status === 'available' && (
+                      <button
+                        onClick={() => handleInquiry(item)}
+                        className="text-white hover:text-red-400 transition-colors"
+                      >
+                        Inquire
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </motion.div>
