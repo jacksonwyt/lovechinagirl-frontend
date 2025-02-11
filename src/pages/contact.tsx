@@ -1,4 +1,4 @@
-//src/pages/contact.tsx
+// src/pages/contact.tsx
 
 import { useState } from 'react';
 import Head from 'next/head';
@@ -47,17 +47,19 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
- 
+
     try {
       const validatedData = contactSchema.parse(formData);
-      await api.post('/api/contact', validatedData);
+      // Note: Use '/contact' because your axios base URL already includes '/api'
+      await api.post('/contact', validatedData);
       toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Partial<ContactForm> = {};
         error.errors.forEach(err => {
-          if (err.path[0]) fieldErrors[err.path[0] as keyof ContactForm] = err.message;
+          if (err.path[0])
+            fieldErrors[err.path[0] as keyof ContactForm] = err.message;
         });
         setErrors(fieldErrors);
         toast.error('Please check the form for errors');
@@ -86,7 +88,10 @@ export default function Contact() {
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-white mb-2"
+              >
                 Name
               </label>
               <input
@@ -95,7 +100,7 @@ export default function Contact() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
                   ${errors.name ? 'border-red-500' : 'border-gray-800'}`}
                 disabled={isSubmitting}
               />
@@ -105,7 +110,10 @@ export default function Contact() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-white mb-2"
+              >
                 Email
               </label>
               <input
@@ -114,7 +122,7 @@ export default function Contact() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
                   ${errors.email ? 'border-red-500' : 'border-gray-800'}`}
                 disabled={isSubmitting}
               />
@@ -124,7 +132,10 @@ export default function Contact() {
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="message"
+                className="block text-sm font-medium text-white mb-2"
+              >
                 Message
               </label>
               <textarea
@@ -133,7 +144,7 @@ export default function Contact() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
                   ${errors.message ? 'border-red-500' : 'border-gray-800'}`}
                 disabled={isSubmitting}
               />
@@ -144,8 +155,7 @@ export default function Contact() {
 
             <button
               type="submit"
-              className="w-full bg-red-600 text-white py-3 px-6 rounded-md hover:bg-red-700 transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-red-600 text-white py-3 px-6 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSubmitting || Object.keys(errors).length > 0}
             >
               {isSubmitting ? 'Sending...' : 'Send Message'}
