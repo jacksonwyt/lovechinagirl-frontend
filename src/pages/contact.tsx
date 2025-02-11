@@ -5,7 +5,6 @@ import Head from 'next/head';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { z } from 'zod';
-import api from '@/api/axios';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -27,6 +26,7 @@ export default function Contact() {
   const validateField = (name: keyof ContactForm, value: string) => {
     try {
       contactSchema.shape[name].parse(value);
+      // Remove error key if the field is valid
       setErrors(prev => {
         const { [name]: removed, ...rest } = prev;
         return rest;
@@ -38,21 +38,32 @@ export default function Contact() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     validateField(name as keyof ContactForm, value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Validate the form data
     try {
-      const validatedData = contactSchema.parse(formData);
-      // Note: Use '/contact' because your axios base URL already includes '/api'
-      await api.post('/contact', validatedData);
-      toast.success('Message sent successfully!');
+      contactSchema.parse(formData);
+
+      // Construct a mailto URL
+      const subject = encodeURIComponent('Website Inquiry');
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      );
+      // Redirect the browser to the mailto URL, which opens the user's email client
+      window.location.href = `mailto:lovechinagirl@me.com?subject=${subject}&body=${body}`;
+      toast.success('Your email client should open shortly.');
+      
+      // Optionally clear the form after submission
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -62,9 +73,9 @@ export default function Contact() {
             fieldErrors[err.path[0] as keyof ContactForm] = err.message;
         });
         setErrors(fieldErrors);
-        toast.error('Please check the form for errors');
+        toast.error('Please check the form for errors.');
       } else {
-        toast.error('Failed to send message. Please try again later.');
+        toast.error('Something went wrong. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
@@ -88,10 +99,7 @@ export default function Contact() {
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-white mb-2"
-              >
+              <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                 Name
               </label>
               <input
@@ -100,8 +108,9 @@ export default function Contact() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
-                  ${errors.name ? 'border-red-500' : 'border-gray-800'}`}
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white ${
+                  errors.name ? 'border-red-500' : 'border-gray-800'
+                }`}
                 disabled={isSubmitting}
               />
               {errors.name && (
@@ -110,10 +119,7 @@ export default function Contact() {
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-white mb-2"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                 Email
               </label>
               <input
@@ -122,8 +128,9 @@ export default function Contact() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
-                  ${errors.email ? 'border-red-500' : 'border-gray-800'}`}
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white ${
+                  errors.email ? 'border-red-500' : 'border-gray-800'
+                }`}
                 disabled={isSubmitting}
               />
               {errors.email && (
@@ -132,10 +139,7 @@ export default function Contact() {
             </div>
 
             <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-medium text-white mb-2"
-              >
+              <label htmlFor="message" className="block text-sm font-medium text-white mb-2">
                 Message
               </label>
               <textarea
@@ -144,8 +148,9 @@ export default function Contact() {
                 rows={6}
                 value={formData.message}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white
-                  ${errors.message ? 'border-red-500' : 'border-gray-800'}`}
+                className={`w-full px-4 py-2 bg-black border rounded-md focus:ring-1 focus:ring-red-500 text-white ${
+                  errors.message ? 'border-red-500' : 'border-gray-800'
+                }`}
                 disabled={isSubmitting}
               />
               {errors.message && (
@@ -158,7 +163,7 @@ export default function Contact() {
               className="w-full bg-red-600 text-white py-3 px-6 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSubmitting || Object.keys(errors).length > 0}
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? 'Processing...' : 'Send Email'}
             </button>
           </form>
         </motion.div>
@@ -166,3 +171,4 @@ export default function Contact() {
     </>
   );
 }
+
