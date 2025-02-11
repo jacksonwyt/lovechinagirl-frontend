@@ -57,7 +57,9 @@ export default function Contact() {
       // Construct a mailto URL
       const subject = encodeURIComponent('Website Inquiry');
       const body = encodeURIComponent(
-        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+        `Email: ${formData.email}\n\n
+        \n${formData.message}
+        \n${formData.name}\n`
       );
       // Redirect the browser to the mailto URL, which opens the user's email client
       window.location.href = `mailto:lovechinagirl@me.com?subject=${subject}&body=${body}`;
