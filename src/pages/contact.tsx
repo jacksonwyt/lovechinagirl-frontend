@@ -27,7 +27,10 @@ export default function Contact() {
   const validateField = (name: keyof ContactForm, value: string) => {
     try {
       contactSchema.shape[name].parse(value);
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors(prev => {
+        const { [name]: removed, ...rest } = prev;
+        return rest;
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors(prev => ({ ...prev, [name]: error.errors[0].message }));
