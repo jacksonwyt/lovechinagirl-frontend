@@ -39,7 +39,7 @@ export default function ShopItemDetail({ item }: ShopItemDetailProps) {
 
   const handleInquiry = async () => {
     try {
-      await api.post('/contact', {
+      await api.post('/api/contact', {
         name: `Inquiry about: ${item.name}`,
         email: 'test@example.com',
         message: `I'm interested in this item: ${item.name}`,

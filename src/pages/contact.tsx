@@ -47,7 +47,7 @@ export default function Contact() {
  
     try {
       const validatedData = contactSchema.parse(formData);
-      await api.post('/contact', validatedData);
+      await api.post('/api/contact', validatedData);
       toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
